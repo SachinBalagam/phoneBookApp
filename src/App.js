@@ -1,4 +1,5 @@
 import {Component} from 'react'
+import {v4 as uuid} from 'uuid'
 
 import ContactItem from './components/ContactItem'
 
@@ -6,19 +7,19 @@ import './App.css'
 
 const initialContactsList = [
   {
-    id: 1,
+    id: uuid(),
     name: 'Ram',
     mobileNo: 9999988888,
     isFavorite: false,
   },
   {
-    id: 2,
+    id: uuid(),
     name: 'Pavan',
     mobileNo: 8888866666,
     isFavorite: true,
   },
   {
-    id: 3,
+    id: uuid(),
     name: 'Nikhil',
     mobileNo: 9999955555,
     isFavorite: false,
@@ -34,6 +35,18 @@ class App extends Component {
 
   onAddContact = event => {
     event.preventDefault()
+    const {name, mobileNo} = this.state
+    const newContact = {
+      id: uuid(),
+      name,
+      mobileNo,
+      isFavorite: false,
+    }
+    this.setState(prevState => ({
+      contactsList: [...prevState.contactsList, newContact],
+      name: '',
+      mobileNo: '',
+    }))
   }
 
   onChangeMobileNo = event => {
@@ -42,6 +55,17 @@ class App extends Component {
 
   onChangeName = event => {
     this.setState({name: event.target.value})
+  }
+
+  onFavoriteToggle = id => {
+    this.setState(prevState => ({
+      contactsList: prevState.contactsList.map(eachContact => {
+        if (eachContact.id === id) {
+          return {...eachContact, isFavorite: !eachContact.isFavorite}
+        }
+        return eachContact
+      }),
+    }))
   }
 
   render() {
@@ -74,7 +98,11 @@ class App extends Component {
               <p className="table-header-cell">Mobile Number</p>
             </li>
             {contactsList.map(eachContact => (
-              <ContactItem key={eachContact.id} contactDetails={eachContact} />
+              <ContactItem
+                key={eachContact.id}
+                contactDetails={eachContact}
+                onFavoriteToggle={this.onFavoriteToggle}
+              />
             ))}
           </ul>
         </div>
